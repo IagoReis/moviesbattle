@@ -1,9 +1,9 @@
 package br.com.letscode.moviesbattle.data.entity;
 
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -12,19 +12,20 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "movie")
+@Table(name = "user")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class MovieEntity {
+public class UserEntity {
 	
-	@Id	
-	private String id;
-	
-	@Column(nullable = false)
-	private String title;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 	
 	@Column(nullable = false)
-	private BigDecimal rating;
+	private String login;
+	
+	@Column(nullable = false)
+	private String password;
 
 }

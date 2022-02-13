@@ -1,16 +1,30 @@
 omdb:
   endpoint: http://www.omdbapi.com
-  movies:
-    - tt0446029
-    - tt1250777
-    - tt0409459
-    - tt0133093
-    - tt0408236
-    - tt1179904
-    - tt0848228
-    - tt0974015
-    - tt0418279
-    - tt1099212
+
+moviesbattle:
+  init:
+    movies:
+      - tt0446029
+      - tt1250777
+      - tt0409459
+      - tt0133093
+      - tt0408236
+      - tt1179904
+      - tt0848228
+      - tt0974015
+      - tt0418279
+      - tt1099212
+      - tt1922777
+    users:
+      -
+        login: rapadura
+        password: rapadura
+      -
+        login: jovemnerd
+        password: jovemnerd
+      -
+        login: load
+        password: load
 
 logging:
   level:
