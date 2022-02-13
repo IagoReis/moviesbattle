@@ -1,9 +1,31 @@
 omdb:
   endpoint: http://www.omdbapi.com
- 
-
+  movies:
+    - tt0446029
+    - tt1250777
+    - tt0409459
+    - tt0133093
+    - tt0408236
+    - tt1179904
+    - tt0848228
+    - tt0974015
+    - tt0418279
+    - tt1099212
 
 logging:
   level:
     org:
-      springframework: TRACE 
+      springframework: INFO
+
+spring:
+  h2:
+    console:
+      enabled: true
+  datasource:
+    url: jdbc:h2:mem:moviesbattle
+    driverClassName: org.h2.Driver
+    username: sa
+    password: 
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    
