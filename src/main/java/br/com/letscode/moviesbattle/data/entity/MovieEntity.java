@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,6 +28,7 @@ public class MovieEntity {
 	@Column(nullable = false)
 	private String title;
 	
+	@JsonIgnore
 	@Column(nullable = false)
 	private BigDecimal rating;
 

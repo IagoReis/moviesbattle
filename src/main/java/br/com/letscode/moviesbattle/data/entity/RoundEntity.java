@@ -9,10 +9,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.PrePersist;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -22,11 +22,11 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Entity
-@Table(name = "battle")
+@Table(name = "round")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class BattleEntity {
+public class RoundEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,21 +35,24 @@ public class BattleEntity {
 	@JsonIgnore
 	@ToString.Exclude
 	@ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_user")
-	private UserEntity user;
+    @JoinColumn(name = "id_battle")
+	private BattleEntity battle;
 	
-	@Transient
-	private List<RoundEntity> rounds;
+	@JsonIgnore
+	@ToString.Exclude
+	@ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_movie_right")
+	private MovieEntity movieRight;
 	
-	@Column
-	private Integer tries;
-	
+	@ToString.Exclude
+	@ManyToMany
+	@JoinTable(name = "round_movie", joinColumns = @JoinColumn(name = "id_round"), inverseJoinColumns = @JoinColumn(name = "id_movie"))
+	private List<MovieEntity> movies;
+		
 	@Column
 	private Boolean correct;
-	
-	@PrePersist
-	private void prePersist() {
-		tries = 0;
-	}
-	
+		
+	@Column(nullable = true)
+	private Integer number;
+
 }

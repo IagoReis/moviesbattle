@@ -1,6 +1,7 @@
 package br.com.letscode.moviesbattle.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,10 +13,10 @@ import br.com.letscode.moviesbattle.data.entity.MovieEntity;
 public interface MovieRepository extends JpaRepository<MovieEntity, String> {
 	
 	@Query(value = "SELECT * FROM movie ORDER BY RAND() LIMIT 1", nativeQuery = true)
-	MovieEntity findRandon();
+	Optional<MovieEntity> findRandon();
 	
 	@Query(value = "SELECT * FROM movie WHERE id NOT IN(:unavailableMovies) ORDER BY RAND() LIMIT 1", nativeQuery = true)
-	MovieEntity findAvailable(final List<String> unavailableMovies);
+	Optional<MovieEntity> findAvailable(final List<String> unavailableMovies);
 	
 	@Query(value = "" +
 			"SELECT * FROM movie mm\n" + 
@@ -29,6 +30,6 @@ public interface MovieRepository extends JpaRepository<MovieEntity, String> {
 			"    AND m.id NOT IN (:unavailableMovies)\n" + 
 			")" +
 			"LIMIT 1", nativeQuery = true)
-	MovieEntity findAvailable(final List<String> unavailableMovies, final Long idUser);
+	Optional<MovieEntity> findAvailable(final List<String> unavailableMovies, final Long idUser);
 	
 }
