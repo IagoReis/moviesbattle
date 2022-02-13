@@ -1,0 +1,9 @@
+omdb:
+  endpoint: http://www.omdbapi.com
+ 
+
+
+logging:
+  level:
+    org:
+      springframework: TRACE 
