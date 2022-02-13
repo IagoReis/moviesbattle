@@ -29,12 +29,21 @@ public class InitCommandLineRunner implements CommandLineRunner {
 	public void run(final String... args) throws Exception {
 		
 		for(final String id : properties.getInit().getMovies()) {
-			final var movie = integration.getById(id);
-			business.insert(movie);
+			try {
+				final var movie = integration.getById(id);
+				business.insert(movie);	
+			} catch (Exception e) {
+				// TODO: handle exception
+			}			
 		}
 		
 		for(final UserEntity user : properties.getInit().getUsers()) {			
-			repository.save(user);
+			try {
+				repository.save(user);	
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+			
 		}
 		
 	}

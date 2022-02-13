@@ -13,13 +13,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/*
 @Entity
 @Table(name = "battle_movie")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+*/
 public class BatleMovieEntity implements Serializable {
 	
+	/*
 	private static final long serialVersionUID = -2623596961707392088L;
 
 	@Id
@@ -31,5 +34,5 @@ public class BatleMovieEntity implements Serializable {
 	@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_movie")
 	private MovieEntity movie;
-
+	*/
 }
