@@ -1,5 +1,7 @@
 package br.com.letscode.moviesbattle.business;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -12,6 +14,8 @@ import br.com.letscode.moviesbattle.data.entity.BattleEntity;
 import br.com.letscode.moviesbattle.data.entity.MovieEntity;
 import br.com.letscode.moviesbattle.data.entity.RoundEntity;
 import br.com.letscode.moviesbattle.data.entity.UserEntity;
+import br.com.letscode.moviesbattle.enums.BattleStatusEnum;
+import br.com.letscode.moviesbattle.enums.RoundStatusEnum;
 import br.com.letscode.moviesbattle.exception.UnavailableMoviesException;
 import br.com.letscode.moviesbattle.repository.BattleRepository;
 import br.com.letscode.moviesbattle.repository.MovieRepository;
@@ -37,8 +41,42 @@ public class BattleBusiness {
 		final var battleSaved = battleRepository.save(battle);
 		
 		this.addRound(battleSaved.getId());
+				
+		return battleSaved;
+	}
+	
+	public BattleEntity end(final Long idBattle, final BattleStatusEnum status) {
+
+		final var battle = this.getById(idBattle);
+		battle.setStatus(status);
 		
-		return this.getById(battleSaved.getId());
+		Integer total = 0;
+		Integer points = 0;		
+		
+		for(final RoundEntity round : battle.getRounds()) {
+			
+			total++;
+			
+			if(Boolean.TRUE.equals(round.getCorrect())) {
+				points++;
+			}
+			
+			if(round.getStatus().equals(RoundStatusEnum.WAITING)) {
+				round.setStatus(RoundStatusEnum.CANCELLED);
+				round.setCorrect(Boolean.FALSE);
+				this.updateRound(round);
+			}
+		}
+		
+		var percent = new BigDecimal("100").divide(BigDecimal.valueOf(total)).multiply(BigDecimal.valueOf(points));
+		percent = percent.setScale(2, RoundingMode.HALF_UP);
+		
+		battle.setPoints(points);
+		battle.setPercent(percent);
+
+		battleRepository.save(battle);
+		
+		return this.getById(idBattle);
 	}
 
 	public BattleEntity getById(final Long idBattle) {
@@ -47,6 +85,10 @@ public class BattleBusiness {
 		response.setRounds(roundRepository.findByBattleId(idBattle));
 		
 		return response;
+	}
+	
+	public RoundEntity updateRound(final RoundEntity roundEntity) {
+		return roundRepository.save(roundEntity);
 	}
 	
 	public List<RoundEntity> getRounds(final Long idBattle) {
@@ -74,7 +116,7 @@ public class BattleBusiness {
 			firstMovieOptional = movieRepository.findAvailable(unavailableFirst);
 			
 			if (firstMovieOptional.isEmpty()) {
-				throw new UnavailableMoviesException("PRIMEIRO FILME NÃO DISPONÍVEL"); 
+				throw new UnavailableMoviesException("Não há filmes disponíveis"); 
 			}
 			
 			unavailableFirst.add(firstMovieOptional.get().getId());
@@ -96,7 +138,10 @@ public class BattleBusiness {
 			
 			secondMovieOptional = movieRepository.findAvailable(unavailableSecond);
 			
-			if(secondMovieOptional.isEmpty()) {
+			if(
+				secondMovieOptional.isEmpty() ||
+				(firstMovieOptional.get().getRating().compareTo(secondMovieOptional.get().getRating()) == 0)
+			) {
 				continue;
 			}
 			
@@ -108,6 +153,7 @@ public class BattleBusiness {
 		final var round = new RoundEntity();
 		round.setBattle(BattleEntity.builder().id(idBattle).build());
 		round.setMovies(movies);
+		round.setNumber(rounds.size() + 1);
 		
 		final RoundEntity roundSaved = roundRepository.save(round);
 		

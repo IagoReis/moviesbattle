@@ -1,5 +1,6 @@
 package br.com.letscode.moviesbattle.data.entity;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -16,6 +17,7 @@ import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import br.com.letscode.moviesbattle.enums.BattleStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -44,14 +46,17 @@ public class BattleEntity {
 	private List<RoundEntity> rounds;
 	
 	@Column
-	private Integer tries;
+	private BattleStatusEnum status;
 	
 	@Column
-	private Boolean correct;
+	private Integer points;
+	
+	@Column
+	private BigDecimal percent;
 	
 	@PrePersist
 	private void prePersist() {
-		tries = 0;
+		status = BattleStatusEnum.WAITING;
 	}
 	
 }

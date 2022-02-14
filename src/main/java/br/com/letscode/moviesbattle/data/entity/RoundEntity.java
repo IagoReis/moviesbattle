@@ -12,10 +12,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import br.com.letscode.moviesbattle.enums.RoundStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -38,12 +40,6 @@ public class RoundEntity {
     @JoinColumn(name = "id_battle")
 	private BattleEntity battle;
 	
-	@JsonIgnore
-	@ToString.Exclude
-	@ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_movie_right")
-	private MovieEntity movieRight;
-	
 	@ToString.Exclude
 	@ManyToMany
 	@JoinTable(name = "round_movie", joinColumns = @JoinColumn(name = "id_round"), inverseJoinColumns = @JoinColumn(name = "id_movie"))
@@ -51,8 +47,16 @@ public class RoundEntity {
 		
 	@Column
 	private Boolean correct;
+	
+	@Column
+	private RoundStatusEnum status;
 		
 	@Column(nullable = true)
 	private Integer number;
+	
+	@PrePersist
+	private void prePersist() {
+		status = RoundStatusEnum.WAITING;
+	}
 
 }
