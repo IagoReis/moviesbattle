@@ -28,7 +28,7 @@ public class BattleContorller {
 		
 		final var user = repository.findAll().get(0);
 				
-		final var battle = business.start(user);
+		final var battle = business.insert(user);
 		
 		final var response = new ResponseEntity<>(battle, HttpStatus.OK);
 		

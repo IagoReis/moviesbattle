@@ -1,7 +1,9 @@
 package br.com.letscode.moviesbattle.business;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,100 +12,108 @@ import br.com.letscode.moviesbattle.data.entity.BattleEntity;
 import br.com.letscode.moviesbattle.data.entity.MovieEntity;
 import br.com.letscode.moviesbattle.data.entity.RoundEntity;
 import br.com.letscode.moviesbattle.data.entity.UserEntity;
+import br.com.letscode.moviesbattle.exception.UnavailableMoviesException;
 import br.com.letscode.moviesbattle.repository.BattleRepository;
 import br.com.letscode.moviesbattle.repository.MovieRepository;
 import br.com.letscode.moviesbattle.repository.RoundRepository;
 
 @Service
 public class BattleBusiness {
-	
+
 	@Autowired
 	private BattleRepository battleRepository;
-	
+
 	@Autowired
 	private RoundRepository roundRepository;
-	
+
 	@Autowired
 	private MovieRepository movieRepository;
-	
-	public BattleEntity getById(final Long id) {
+
+	public BattleEntity insert(final UserEntity user) {
+
+		final var battle = new BattleEntity();		
+		battle.setUser(user);
+
+		final var battleSaved = battleRepository.save(battle);
 		
-		final var response = battleRepository.findById(id).get();
-		response.setRounds(roundRepository.findByBattleId(id));
+		this.addRound(battleSaved.getId());
+		
+		return this.getById(battleSaved.getId());
+	}
+
+	public BattleEntity getById(final Long idBattle) {
+		
+		final var response = battleRepository.findById(idBattle).get();
+		response.setRounds(roundRepository.findByBattleId(idBattle));
 		
 		return response;
 	}
 	
-	public BattleEntity start(final UserEntity user) {
+	public List<RoundEntity> getRounds(final Long idBattle) {
 		
-		final var battle = new BattleEntity();		
-		battle.setUser(user);
+		final var response = roundRepository.findByBattleId(idBattle);
 		
-		final var battleSaved = battleRepository.save(battle);
+		return response;
+	}
+	
+	public RoundEntity addRound(final Long idBattle) {
 		
-		final var firstMovieOptional = movieRepository.findRandon();
+		final List<String> unavailableFirst = new ArrayList<>();
+		unavailableFirst.add("default-init");
 		
-		if (firstMovieOptional.isEmpty()) {
-			throw new RuntimeException("PRIMEIRO FILME NÃO DISPONÍVEL"); 
-		}
-		
-		final var secondMovieOptional = movieRepository.findAvailable(Collections.singletonList(firstMovieOptional.get().getId()));
-		
-		if (secondMovieOptional.isEmpty()) {
-			throw new RuntimeException("SEGUNDO FILME NÃO DISPONÍVEL"); 
-		}
+		List<String> unavailableSecond;
 		
 		final var movies = new ArrayList<MovieEntity>();
-		movies.add(firstMovieOptional.get());
-		movies.add(secondMovieOptional.get());
 		
-		final var round = new RoundEntity();
-		round.setBattle(battle);
-		round.setMovies(movies);
+		Optional<MovieEntity> firstMovieOptional; 
+		Optional<MovieEntity> secondMovieOptional;
 		
-		roundRepository.save(round);
+		final var rounds = this.getRounds(idBattle);
 				
-		return this.getById(battleSaved.getId());
-		
-		/*
-		final var movies = new ArrayList<MovieEntity>();
-		
-		var available = movieRepository.findRandon();
-		
-		List<String> unavailableMovies = new ArrayList<>();
-		
-		unavailableMovies.add(available.getId());
-		
-		MovieEntity secondAvailable;
-		
-		do {
+		do {			
+			firstMovieOptional = movieRepository.findAvailable(unavailableFirst);
 			
-			secondAvailable = movieRepository.findAvailable(unavailableMovies, user.getId());
+			if (firstMovieOptional.isEmpty()) {
+				throw new UnavailableMoviesException("PRIMEIRO FILME NÃO DISPONÍVEL"); 
+			}
 			
-			if (Objects.isNull(secondAvailable)) {
-				
-				available = movieRepository.findAvailable(unavailableMovies);
-				
-				if (Objects.isNull(available)) {
-					throw new RuntimeException("NÃO TEM MAIS FILMES DISPONÍVEIS");
+			unavailableFirst.add(firstMovieOptional.get().getId());
+			
+			unavailableSecond = new ArrayList<>();
+			unavailableSecond.add(firstMovieOptional.get().getId());
+			
+			if(!Objects.isNull(rounds)) {
+				for(final RoundEntity round : rounds) {
+					if (round.getMovies().get(0).getId().equals(firstMovieOptional.get().getId())) {
+						unavailableSecond.add(round.getMovies().get(1).getId());
+					}
+					
+					if (round.getMovies().get(1).getId().equals(firstMovieOptional.get().getId())) {
+						unavailableSecond.add(round.getMovies().get(0).getId());
+					}
 				}
-				
-				unavailableMovies.add(available.getId());
-				
+			}
+			
+			secondMovieOptional = movieRepository.findAvailable(unavailableSecond);
+			
+			if(secondMovieOptional.isEmpty()) {
 				continue;
 			}
 			
-			movies.add(available);
-			movies.add(secondAvailable);
+			movies.add(firstMovieOptional.get());
+			movies.add(secondMovieOptional.get());
 		}
-		while(movies.size() < 2);
+		while(movies.isEmpty());
 		
-		final var entity = new BattleEntity();		
-		entity.setUser(user);
-		entity.setMovies(movies);
+		final var round = new RoundEntity();
+		round.setBattle(BattleEntity.builder().id(idBattle).build());
+		round.setMovies(movies);
 		
-		battleRepository.save(entity);
-		*/
+		final RoundEntity roundSaved = roundRepository.save(round);
+		
+		return roundSaved;
 	}
+	
+	
 		
 }
