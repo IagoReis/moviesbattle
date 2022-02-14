@@ -13,13 +13,13 @@ import org.springframework.stereotype.Service;
 import br.com.letscode.moviesbattle.data.entity.BattleEntity;
 import br.com.letscode.moviesbattle.data.entity.MovieEntity;
 import br.com.letscode.moviesbattle.data.entity.RoundEntity;
-import br.com.letscode.moviesbattle.data.entity.UserEntity;
 import br.com.letscode.moviesbattle.enums.BattleStatusEnum;
 import br.com.letscode.moviesbattle.enums.RoundStatusEnum;
 import br.com.letscode.moviesbattle.exception.UnavailableMoviesException;
 import br.com.letscode.moviesbattle.repository.BattleRepository;
 import br.com.letscode.moviesbattle.repository.MovieRepository;
 import br.com.letscode.moviesbattle.repository.RoundRepository;
+import br.com.letscode.moviesbattle.security.AuthFacade;
 
 @Service
 public class BattleBusiness {
@@ -32,8 +32,19 @@ public class BattleBusiness {
 
 	@Autowired
 	private MovieRepository movieRepository;
+	
+	@Autowired
+	private AuthFacade authFacade; 
+	
+	private void validateUser(final BattleEntity battle) {
+		if(!battle.getUser().getId().equals(authFacade.getUser().getId())) {
+			throw new RuntimeException("Usuário sem permissão");
+		}
+	}
 
-	public BattleEntity insert(final UserEntity user) {
+	public BattleEntity insert() {
+		
+		final var user = authFacade.getUser();
 
 		final var battle = new BattleEntity();		
 		battle.setUser(user);
@@ -49,6 +60,8 @@ public class BattleBusiness {
 
 		final var battle = this.getById(idBattle);
 		battle.setStatus(status);
+		
+		validateUser(battle);
 		
 		Integer total = 0;
 		Integer points = 0;		
@@ -81,13 +94,19 @@ public class BattleBusiness {
 
 	public BattleEntity getById(final Long idBattle) {
 		
-		final var response = battleRepository.findById(idBattle).get();
-		response.setRounds(roundRepository.findByBattleId(idBattle));
+		final var battle = battleRepository.findById(idBattle).get();
 		
-		return response;
+		validateUser(battle);
+		
+		battle.setRounds(roundRepository.findByBattleId(idBattle));
+		
+		return battle;
 	}
 	
 	public RoundEntity updateRound(final RoundEntity roundEntity) {
+		
+		validateUser(roundEntity.getBattle());
+		
 		return roundRepository.save(roundEntity);
 	}
 	

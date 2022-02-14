@@ -15,7 +15,6 @@ import br.com.letscode.moviesbattle.business.BattleBusiness;
 import br.com.letscode.moviesbattle.data.entity.BattleEntity;
 import br.com.letscode.moviesbattle.enums.BattleStatusEnum;
 import br.com.letscode.moviesbattle.enums.RoundStatusEnum;
-import br.com.letscode.moviesbattle.repository.UserRepository;
 
 @Controller
 @RequestMapping("/battles")
@@ -24,15 +23,10 @@ public class BattleController {
 	@Autowired
 	private BattleBusiness business;
 	
-	@Autowired
-	private UserRepository repository;
-	
 	@PostMapping("/start")
 	public ResponseEntity<BattleEntity> start() {
-		
-		final var user = repository.findAll().get(0);
 				
-		final var battle = business.insert(user);
+		final var battle = business.insert();
 		
 		final var response = new ResponseEntity<>(battle, HttpStatus.OK);
 		

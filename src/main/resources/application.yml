@@ -18,10 +18,10 @@ moviesbattle:
     users:
       -
         login: rapadura
-        password: rapadura
+        password: $2a$12$6M5GoVzPqHomuvS5ovQ46.P6mEiuIfSIR4WP.7aSt/qRhZOasDnnO 
       -
         login: jovemnerd
-        password: jovemnerd
+        password: $2a$12$GxlTaS8a5tvrmS3X/wXjQukJqBKWQx8ItBxoqP3eVg0Qm6fy7dy.e 
       -
         login: load
         password: load
