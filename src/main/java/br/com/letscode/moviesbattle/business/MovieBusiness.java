@@ -25,7 +25,7 @@ public class MovieBusiness {
 		
 		repository.save(entity);
 		
-		return movie;		
+		return movie;
 	}
 	
 }

@@ -70,8 +70,6 @@ public class BattleBusiness {
 		battle.setUser(user);
 
 		final var battleSaved = battleRepository.save(battle);
-		
-		this.addRound(battleSaved.getId());
 				
 		return battleSaved;
 	}

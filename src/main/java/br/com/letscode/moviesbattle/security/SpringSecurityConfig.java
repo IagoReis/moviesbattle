@@ -33,6 +33,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 	public void configure(final WebSecurity web) throws Exception {
 	    web.ignoring()
 	    	.antMatchers("/h2-console/**")
+	    	.antMatchers("/swagger-ui")
 	    	.antMatchers("/swagger-ui/**")
 	    	.antMatchers("/v3/api-docs/**");
 	}
