@@ -81,11 +81,13 @@ public class BattleController {
 	}
 	
 	@GetMapping("/ranking")
-	public ResponseEntity<?> ranking() {
+	public ResponseEntity<List<QuizDto>> ranking() {
 		
 		final List<BattleEntity> ranking = business.getRanking();
 		
-		final var response = new ResponseEntity<>(ranking, HttpStatus.OK);
+		final var dto = QuizMapper.INSTANCE.map(ranking);
+		
+		final var response = new ResponseEntity<>(dto, HttpStatus.OK);
 		
 		return response;		
 	}

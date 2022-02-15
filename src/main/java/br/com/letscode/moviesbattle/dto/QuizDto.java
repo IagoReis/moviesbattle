@@ -25,6 +25,9 @@ public class QuizDto {
 	@JsonProperty("erros")
 	private Integer erros;
 	
+	@JsonProperty("usuario")
+	private String usuario;
+	
 	@JsonProperty("pontos")
 	private Integer pontos;
 	
