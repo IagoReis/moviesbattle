@@ -5,26 +5,23 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import br.com.letscode.moviesbattle.business.BattleBusiness;
-import br.com.letscode.moviesbattle.data.entity.BattleEntity;
-import br.com.letscode.moviesbattle.data.entity.RoundEntity;
 import br.com.letscode.moviesbattle.dto.QuizDto;
 import br.com.letscode.moviesbattle.dto.RoundDto;
 import br.com.letscode.moviesbattle.enums.BattleStatusEnum;
 import br.com.letscode.moviesbattle.enums.RoundStatusEnum;
-import br.com.letscode.moviesbattle.exception.UnavailableQuizException;
 import br.com.letscode.moviesbattle.exception.UnavailableRoundException;
 import br.com.letscode.moviesbattle.exception.WrongMovieException;
 import br.com.letscode.moviesbattle.mapper.dto.QuizMapper;
 import br.com.letscode.moviesbattle.mapper.dto.RoundMapper;
 
-@Controller
+@RestController
 @RequestMapping("/quiz")
 public class BattleController {
 	
