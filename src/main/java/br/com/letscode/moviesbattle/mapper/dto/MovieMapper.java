@@ -14,6 +14,7 @@ public abstract class MovieMapper {
 	
 	@Mapping(target = "idFilme", source = "id")
 	@Mapping(target = "titulo", source = "title")
+	@Mapping(target = "ano", source = "year")
 	public abstract MovieResponseDto map(final MovieEntity entity);
 	
 }

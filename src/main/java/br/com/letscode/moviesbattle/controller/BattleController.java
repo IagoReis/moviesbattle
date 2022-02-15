@@ -1,5 +1,6 @@
 package br.com.letscode.moviesbattle.controller;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,23 +13,27 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.letscode.moviesbattle.business.BattleBusiness;
+import br.com.letscode.moviesbattle.data.entity.BattleEntity;
 import br.com.letscode.moviesbattle.dto.QuizDto;
 import br.com.letscode.moviesbattle.dto.RoundDto;
 import br.com.letscode.moviesbattle.enums.BattleStatusEnum;
 import br.com.letscode.moviesbattle.enums.RoundStatusEnum;
+import br.com.letscode.moviesbattle.exception.UnavailableQuizException;
 import br.com.letscode.moviesbattle.exception.UnavailableRoundException;
 import br.com.letscode.moviesbattle.exception.WrongMovieException;
 import br.com.letscode.moviesbattle.mapper.dto.QuizMapper;
 import br.com.letscode.moviesbattle.mapper.dto.RoundMapper;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 @RequestMapping("/quiz")
+@SecurityRequirement(name = "moviesbattleapi")
 public class BattleController {
 	
 	@Autowired
 	private BattleBusiness business;
 	
-	@PostMapping("/start")
+	@PostMapping("/iniciar")
 	public ResponseEntity<QuizDto> start() {
 				
 		final var battle = business.insert();
@@ -40,10 +45,10 @@ public class BattleController {
 		return response;		
 	}
 	
-	@PostMapping("/{idBattle}/end")
-	public ResponseEntity<QuizDto> end(@PathVariable final Long idBattle) {
+	@PostMapping("/{idQuiz}/encerrar")
+	public ResponseEntity<QuizDto> end(@PathVariable(name = "idQuiz") final Long idBattle) {
 		
-		final var battle = business.end(idBattle, BattleStatusEnum.CANCELLED);
+		final var battle = business.end(idBattle);
 		
 		final var dto = QuizMapper.INSTANCE.map(battle);
 		
@@ -52,10 +57,14 @@ public class BattleController {
 		return response;		
 	}
 	
-	@GetMapping("/{idBattle}")
-	public ResponseEntity<RoundDto> quiz(@PathVariable final Long idBattle) {
+	@GetMapping("/{idQuiz}")
+	public ResponseEntity<RoundDto> quiz(@PathVariable(name = "idQuiz") final Long idBattle) {
 				
 		final var battle = business.getById(idBattle);
+		
+		if(!battle.getStatus().equals(BattleStatusEnum.WAITING)) {
+			throw new UnavailableQuizException();
+		}
 		
 		final var rounds = battle.getRounds().stream().filter(a -> a.getStatus().equals(RoundStatusEnum.WAITING)).collect(Collectors.toList());
 		
@@ -71,8 +80,21 @@ public class BattleController {
 		return response;		
 	}
 	
-	@PostMapping("/{idBattle}/rodada/{idRound}/filme/{idMovie}")
-	public ResponseEntity<?> start(@PathVariable final Long idBattle, @PathVariable Long idRound, @PathVariable String idMovie) {
+	@GetMapping("/ranking")
+	public ResponseEntity<?> ranking() {
+		
+		final List<BattleEntity> ranking = business.getRanking();
+		
+		final var response = new ResponseEntity<>(ranking, HttpStatus.OK);
+		
+		return response;		
+	}
+	
+	@PostMapping("/{idQuiz}/rodada/{idRodada}/filme/{idFilme}")
+	public ResponseEntity<?> start(
+			@PathVariable(name = "idQuiz") final Long idBattle,
+			@PathVariable(name = "idRodada") Long idRound, 
+			@PathVariable(name = "idFilme") String idMovie) {
 		
 		final var battle = business.getById(idBattle);
 		
@@ -96,10 +118,23 @@ public class BattleController {
 		
 		final var correct = selectedMovie.getRating().compareTo(notSelectedMovie.getRating()) > 0;
 		
+		if(correct) {
+			battle.setPoints(battle.getPoints()+1);
+		}
+		else {
+			battle.setMistakes(battle.getMistakes()+1);
+		}
+		
 		round.setCorrect(correct);
 		round.setStatus(RoundStatusEnum.ANSWERED);
 		
 		business.updateRound(round);
+		
+		business.updateValues(battle.getRounds().size(), battle.getMistakes(), battle.getPoints(), battle.getId());
+		
+		if(battle.getMistakes() >= 3) {
+			business.end(idBattle);
+		}
 		
 		final var response = new ResponseEntity<>(correct, HttpStatus.OK);
 		

@@ -16,5 +16,8 @@ public class MovieResponseDto {
 	
     @JsonProperty("titulo")
 	private String titulo;
+    
+    @JsonProperty("ano")
+	private String ano;
 
 }

@@ -5,10 +5,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
 import br.com.letscode.moviesbattle.configuration.properties.OmdbProperties;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 
 
 @SpringBootApplication
 @ConfigurationPropertiesScan(basePackageClasses = OmdbProperties.class)
+@SecurityScheme(name = "moviesbattleapi", scheme = "basic", type = SecuritySchemeType.HTTP, in = SecuritySchemeIn.HEADER)
 public class MoviesbattleApplication {
 
 	public static void main(String[] args) {

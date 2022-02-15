@@ -44,11 +44,29 @@ public class BattleBusiness {
 		}
 	}
 
+	public void updateValues(final Integer total, final Integer mistakes, final Integer points, final Long id) {
+		
+		final var battle = battleRepository.getById(id);
+		
+		battle.setTotal(total);
+		battle.setMistakes(mistakes);
+		battle.setPoints(points);
+		
+		battleRepository.save(battle);
+	}
+	
+	public List<BattleEntity> getRanking() {
+		
+		final var ranking = battleRepository.getRanking();
+		
+		return ranking;
+	}
+	
 	public BattleEntity insert() {
 		
 		final var user = authFacade.getUser();
 
-		final var battle = new BattleEntity();		
+		final var battle = new BattleEntity();
 		battle.setUser(user);
 
 		final var battleSaved = battleRepository.save(battle);
@@ -58,7 +76,7 @@ public class BattleBusiness {
 		return battleSaved;
 	}
 	
-	public BattleEntity end(final Long idBattle, final BattleStatusEnum status) {
+	public BattleEntity end(final Long idBattle) {
 
 		var battle = this.getById(idBattle);
 		
@@ -68,10 +86,11 @@ public class BattleBusiness {
 		
 		validateUser(battle);
 		
-		battle.setStatus(status);
+		battle.setStatus(BattleStatusEnum.ANSWERED);
 		
 		Integer total = 0;
 		Integer points = 0;
+		Integer mistakes = 0;
 		
 		for(final RoundEntity round : battle.getRounds()) {
 			
@@ -79,6 +98,9 @@ public class BattleBusiness {
 			
 			if(Boolean.TRUE.equals(round.getCorrect())) {
 				points++;
+			}
+			else {
+				mistakes++;
 			}
 			
 			if(round.getStatus().equals(RoundStatusEnum.WAITING)) {
@@ -91,11 +113,15 @@ public class BattleBusiness {
 		var percent = new BigDecimal("0.00").setScale(2, RoundingMode.HALF_UP);
 		
 		if(total > 0) {
-			percent = new BigDecimal("100").divide(BigDecimal.valueOf(total)).multiply(BigDecimal.valueOf(points));
+			percent = new BigDecimal("100")
+					.divide(BigDecimal.valueOf(total), 2, RoundingMode.HALF_UP)
+					.multiply(BigDecimal.valueOf(points));
 			percent = percent.setScale(2, RoundingMode.HALF_UP);
 		}
 		
 		battle.setPoints(points);
+		battle.setTotal(total);
+		battle.setMistakes(mistakes);
 		battle.setPercent(percent);
 
 		battleRepository.save(battle);
@@ -108,8 +134,6 @@ public class BattleBusiness {
 		final var battle = battleRepository.findById(idBattle).get();
 		
 		validateUser(battle);
-		
-		battle.setRounds(roundRepository.findByBattleId(idBattle));
 		
 		return battle;
 	}

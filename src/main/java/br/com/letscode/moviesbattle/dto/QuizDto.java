@@ -19,6 +19,12 @@ public class QuizDto {
 	@JsonProperty("status")
 	private String status;
 	
+	@JsonProperty("rodadas")
+	private Integer rodadas;
+	
+	@JsonProperty("erros")
+	private Integer erros;
+	
 	@JsonProperty("pontos")
 	private Integer pontos;
 	

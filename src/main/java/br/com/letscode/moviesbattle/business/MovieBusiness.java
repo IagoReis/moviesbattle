@@ -20,6 +20,7 @@ public class MovieBusiness {
 		final var entity = new MovieEntity();
 		entity.setId(movie.getId());
 		entity.setTitle(movie.getTitle());
+		entity.setYear(Integer.valueOf(movie.getYear()));
 		entity.setRating(new BigDecimal(movie.getRating()));
 		
 		repository.save(entity);

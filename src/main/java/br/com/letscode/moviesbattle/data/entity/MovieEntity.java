@@ -28,6 +28,9 @@ public class MovieEntity {
 	@Column(nullable = false)
 	private String title;
 	
+	@Column(nullable = false)
+	private Integer year;
+	
 	@JsonIgnore
 	@Column(nullable = false)
 	private BigDecimal rating;

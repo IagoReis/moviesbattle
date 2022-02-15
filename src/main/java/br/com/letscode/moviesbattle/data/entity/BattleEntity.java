@@ -3,6 +3,7 @@ package br.com.letscode.moviesbattle.data.entity;
 import java.math.BigDecimal;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -11,9 +12,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -42,11 +43,17 @@ public class BattleEntity {
     @JoinColumn(name = "id_user")
 	private UserEntity user;
 	
-	@Transient
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "battle")
 	private List<RoundEntity> rounds;
 	
 	@Column
 	private BattleStatusEnum status;
+	
+	@Column
+	private Integer total;
+	
+	@Column
+	private Integer mistakes;
 	
 	@Column
 	private Integer points;
@@ -57,6 +64,9 @@ public class BattleEntity {
 	@PrePersist
 	private void prePersist() {
 		status = BattleStatusEnum.WAITING;
+		total = 0;
+		points = 0;
+		mistakes = 0;
 	}
 	
 }

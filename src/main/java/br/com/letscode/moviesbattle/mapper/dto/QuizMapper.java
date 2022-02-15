@@ -15,6 +15,8 @@ public abstract class QuizMapper {
 	@Mapping(target = "idQuiz", source = "id")
 	@Mapping(target = "status", source = "status")
 	@Mapping(target = "pontos", source = "points")
+	@Mapping(target = "rodadas", source = "total")
+	@Mapping(target = "erros", source = "mistakes")
 	@Mapping(target = "porcentagemAcerto", source = "percent")
 	public abstract QuizDto map(final BattleEntity entity);
 	

@@ -6,13 +6,13 @@ moviesbattle:
     movies:
       - tt0446029
       - tt1250777
-      - tt0133093      
-      - tt0408236
-      - tt1179904
-      - tt0848228
-      #- tt0974015
+      - tt0409459
       - tt0418279
-      #- tt0409459
+      - tt0133093      
+      #- tt0408236
+      #- tt1179904
+      #- tt0848228
+      #- tt0974015
       #- tt1099212
       #- tt1922777
     users:
@@ -24,7 +24,7 @@ moviesbattle:
         password: $2a$12$GxlTaS8a5tvrmS3X/wXjQukJqBKWQx8ItBxoqP3eVg0Qm6fy7dy.e 
       -
         login: load
-        password: load
+        password: $2a$12$BaDdCDSPaW.YqJJOpNIT6.8jzTKZTMD0PQPh.iG3d3.ooOYI67eGC 
 
 logging:
   level:

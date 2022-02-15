@@ -14,6 +14,9 @@ public class MovieDto {
     @JsonProperty("Title")
 	private String title;
     
+    @JsonProperty("Year")
+	private String year;
+    
     @JsonProperty("imdbRating")
 	private String rating;
     
