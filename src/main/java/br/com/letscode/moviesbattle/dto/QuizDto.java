@@ -1,6 +1,9 @@
 package br.com.letscode.moviesbattle.dto;
 
-import br.com.letscode.moviesbattle.data.entity.RoundEntity;
+import java.math.BigDecimal;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,6 +13,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class QuizDto {
 	
-	private RoundEntity round;
+	@JsonProperty("id_quiz")
+	private String idQuiz;
+	
+	@JsonProperty("status")
+	private String status;
+	
+	@JsonProperty("pontos")
+	private Integer pontos;
+	
+	@JsonProperty("porcentagem_acerto")
+	private BigDecimal porcentagemAcerto;
 
 }

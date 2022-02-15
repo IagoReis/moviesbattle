@@ -16,6 +16,8 @@ import br.com.letscode.moviesbattle.data.entity.RoundEntity;
 import br.com.letscode.moviesbattle.enums.BattleStatusEnum;
 import br.com.letscode.moviesbattle.enums.RoundStatusEnum;
 import br.com.letscode.moviesbattle.exception.UnavailableMoviesException;
+import br.com.letscode.moviesbattle.exception.UnavailableQuizException;
+import br.com.letscode.moviesbattle.exception.UserNotAllowedException;
 import br.com.letscode.moviesbattle.repository.BattleRepository;
 import br.com.letscode.moviesbattle.repository.MovieRepository;
 import br.com.letscode.moviesbattle.repository.RoundRepository;
@@ -38,7 +40,7 @@ public class BattleBusiness {
 	
 	private void validateUser(final BattleEntity battle) {
 		if(!battle.getUser().getId().equals(authFacade.getUser().getId())) {
-			throw new RuntimeException("Usuário sem permissão");
+			throw new UserNotAllowedException();
 		}
 	}
 
@@ -58,13 +60,18 @@ public class BattleBusiness {
 	
 	public BattleEntity end(final Long idBattle, final BattleStatusEnum status) {
 
-		final var battle = this.getById(idBattle);
-		battle.setStatus(status);
+		var battle = this.getById(idBattle);
+		
+		if(!battle.getStatus().equals(BattleStatusEnum.WAITING)) {
+			throw new UnavailableQuizException();
+		}
 		
 		validateUser(battle);
 		
+		battle.setStatus(status);
+		
 		Integer total = 0;
-		Integer points = 0;		
+		Integer points = 0;
 		
 		for(final RoundEntity round : battle.getRounds()) {
 			
@@ -81,8 +88,12 @@ public class BattleBusiness {
 			}
 		}
 		
-		var percent = new BigDecimal("100").divide(BigDecimal.valueOf(total)).multiply(BigDecimal.valueOf(points));
-		percent = percent.setScale(2, RoundingMode.HALF_UP);
+		var percent = new BigDecimal("0.00").setScale(2, RoundingMode.HALF_UP);
+		
+		if(total > 0) {
+			percent = new BigDecimal("100").divide(BigDecimal.valueOf(total)).multiply(BigDecimal.valueOf(points));
+			percent = percent.setScale(2, RoundingMode.HALF_UP);
+		}
 		
 		battle.setPoints(points);
 		battle.setPercent(percent);
@@ -104,9 +115,6 @@ public class BattleBusiness {
 	}
 	
 	public RoundEntity updateRound(final RoundEntity roundEntity) {
-		
-		validateUser(roundEntity.getBattle());
-		
 		return roundRepository.save(roundEntity);
 	}
 	
@@ -176,7 +184,7 @@ public class BattleBusiness {
 		
 		final RoundEntity roundSaved = roundRepository.save(round);
 		
-		return roundSaved;
+		return roundRepository.findById(roundSaved.getId()).get();
 	}
 	
 	

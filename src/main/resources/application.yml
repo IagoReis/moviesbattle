@@ -8,10 +8,10 @@ moviesbattle:
       - tt1250777
       - tt0133093      
       - tt0408236
-      #- tt1179904
-      #- tt0848228
+      - tt1179904
+      - tt0848228
       #- tt0974015
-      #- tt0418279
+      - tt0418279
       #- tt0409459
       #- tt1099212
       #- tt1922777
@@ -46,4 +46,5 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: update
-    
+  jackson:
+    default-property-inclusion: NON_NULL
